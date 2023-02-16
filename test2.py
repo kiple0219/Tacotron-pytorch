@@ -12,8 +12,8 @@ os.makedirs(save_dir, exist_ok=True)
 mel_list = glob.glob(os.path.join(save_dir, '*.npy'))
 
 
-def inference(text, idx):
-    mel = torch.from_numpy(text).unsqueeze(0)
+def inference(mel, idx):
+    mel = torch.from_numpy(mel).unsqueeze(0)
     pred = model(mel)
     pred = pred.squeeze().detach().numpy() 
     pred = np.transpose(pred)

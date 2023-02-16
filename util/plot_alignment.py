@@ -1,7 +1,6 @@
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
-import tensorflow as tf
 import numpy as np
 matplotlib.use('Agg')
 

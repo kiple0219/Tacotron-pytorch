@@ -3,15 +3,14 @@ import numpy as np
 import os, librosa, re, glob, scipy
 from tqdm import tqdm
 from util.hparams import *
-from util.text import text_to_sequence
+from text import text_to_sequence
 
 
-text_dir = './archive/transcript.v.1.4.txt'
-filters = '([.,!?])'
+text_dir = './dataset/my_text.xlsx'
 
-metadata = pd.read_csv(text_dir, dtype='object', sep='|', header=None)
+metadata = pd.read_excel(text_dir, dtype='object', header=None)
 wav_dir = metadata[0].values
-text = metadata[3].values
+text = metadata[1].values
 
 out_dir = './data'
 os.makedirs(out_dir, exist_ok=True)
@@ -23,11 +22,12 @@ os.makedirs(out_dir + '/spec', exist_ok=True)
 # text
 print('Load Text')
 text_len = []
+filters = '([.,!?])'
 for idx, s in enumerate(tqdm(text)):
     sentence = re.sub(re.compile(filters), '', s)
-    sentence = text_to_sequence(sentence)
+    sentence = text_to_sequence(sentence, cleaners)
     text_len.append(len(sentence))
-    text_name = 'kss-text-%05d.npy' % idx
+    text_name = 'my-text-%05d.npy' % idx
     np.save(os.path.join(out_dir + '/text', text_name), sentence, allow_pickle=False)
 np.save(os.path.join(out_dir + '/text_len.npy'), np.array(text_len))
 print('Text Done')
@@ -36,7 +36,7 @@ print('Text Done')
 print('Load Audio')
 mel_len_list = []
 for idx, fn in enumerate(tqdm(wav_dir)):
-    file_dir = './archive/kss/'+ fn
+    file_dir = './archive/my_wav/'+ fn
     wav, _ = librosa.load(file_dir, sr=sample_rate)
     wav, _ = librosa.effects.trim(wav)
     wav = scipy.signal.lfilter([1, -preemphasis], [1], wav)
@@ -61,17 +61,17 @@ for idx, fn in enumerate(tqdm(wav_dir)):
         mel_spec = np.pad(mel_spec, [[0, reduction - remainder], [0, 0]], mode='constant')
         stft = np.pad(stft, [[0, reduction - remainder], [0, 0]], mode='constant')
 
-    mel_name = 'kss-mel-%05d.npy' % idx
+    mel_name = 'my-mel-%05d.npy' % idx
     np.save(os.path.join(out_dir + '/mel', mel_name), mel_spec, allow_pickle=False)
 
-    stft_name = 'kss-spec-%05d.npy' % idx
+    stft_name = 'my-spec-%05d.npy' % idx
     np.save(os.path.join(out_dir + '/spec', stft_name), stft, allow_pickle=False)
 
     # Decoder Input
     mel_spec = mel_spec.reshape((-1, mel_dim * reduction))
     dec_input = np.concatenate((np.zeros_like(mel_spec[:1, :]), mel_spec[:-1, :]), axis=0)
     dec_input = dec_input[:, -mel_dim:]
-    dec_name = 'kss-dec-%05d.npy' % idx
+    dec_name = 'my-dec-%05d.npy' % idx
     np.save(os.path.join(out_dir + '/dec', dec_name), dec_input, allow_pickle=False)
 
 mel_len = sorted(mel_len_list)

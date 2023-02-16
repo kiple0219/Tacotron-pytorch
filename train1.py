@@ -5,7 +5,7 @@ from models.tacotron import Tacotron
 from torch.nn import L1Loss
 from torch.utils.data import Dataset, DataLoader
 from torch.nn.utils.rnn import pad_sequence
-from util.text import sequence_to_text
+from text import sequence_to_text
 from util.plot_alignment import plot_alignment
 from util.hparams import *
 

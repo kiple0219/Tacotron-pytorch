@@ -1,6 +1,6 @@
 max_char = 105
-sample_rate = 22050
-n_fft = 1024
+sample_rate = 16000
+n_fft = 2048
 hop_length = 256
 win_length = 1024
 preemphasis = 0.97
@@ -17,3 +17,4 @@ batch_size = 32
 batch_group = batch_size * batch_size
 checkpoint_step = 2000
 max_iter = 200
+cleaners = ['english_cleaners']

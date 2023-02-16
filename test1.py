@@ -1,14 +1,13 @@
 import os, argparse, glob, torch
 import numpy as np
-from jamo import hangul_to_jamo
 from models.tacotron import Tacotron
-from util.text import text_to_sequence, sequence_to_text
+from text import text_to_sequence, sequence_to_text
 from util.plot_alignment import plot_alignment
 from util.hparams import *
 
 
 sentences = [
-  '정말로 사랑한담 기다려주세요'
+  'Today afternoon I had a lunch with an apple'
 ]
 
 checkpoint_dir = './checkpoint/1'
@@ -17,7 +16,7 @@ os.makedirs(save_dir, exist_ok=True)
 
 
 def inference(text, idx):
-    seq = text_to_sequence(text)
+    seq = text_to_sequence(text, cleaners)
     enc_input = torch.tensor(seq, dtype=torch.int64).unsqueeze(0)
     sequence_length = torch.tensor([len(seq)], dtype=torch.int32)
     dec_input = torch.from_numpy(np.zeros((1, mel_dim), dtype=np.float32))
@@ -42,6 +41,5 @@ if __name__ == "__main__":
     ckpt = torch.load(args.checkpoint)
     model.load_state_dict(ckpt['model'])
     
-    for i, text in enumerate(sentences):
-        jamo = ''.join(list(hangul_to_jamo(text)))
-        inference(jamo, i)
+    for idx, text in enumerate(sentences):
+      inference(text, idx)
